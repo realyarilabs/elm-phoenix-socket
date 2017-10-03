@@ -1,21 +1,30 @@
-module Phoenix.Socket exposing (Socket, Msg, init, update, withDebug, join, leave, push, on, off, listen, withoutHeartbeat, withHeartbeatInterval, withAutoReconnection, config_reconnection, defaultReconnectSec, reJoinAllpreviousChannels)
+module Phoenix.Socket exposing (Socket, Msg, init, update, withDebug, join, leave, push, on, off, listen, withoutHeartbeat, withHeartbeatInterval, map, withAutoReconnection, config_reconnection, defaultReconnectSec, reJoinAllpreviousChannels)
 
 {-|
 
+
 # Socket
-@docs Socket, Msg, init, withDebug, withoutHeartbeat, withHeartbeatInterval, update, listen
+
+@docs Socket, Msg, init, withDebug, withoutHeartbeat, withHeartbeatInterval, update, listen, map
+
 
 # Channels
+
 @docs join, leave
 
+
 # Events
+
 @docs on, off
 
 
 # Sending messages
+
 @docs push
 
+
 # Auto Reconnection timer
+
 @docs withAutoReconnection, config_reconnection, defaultReconnectSec, reJoinAllpreviousChannels
 
 -}
@@ -92,19 +101,17 @@ init path =
     }
 
 
-{-|
-  Default time for autoReconnect
-
+{-| Default time for autoReconnect
 -}
 defaultReconnectSec : Int
 defaultReconnectSec =
     30
 
 
-{-|
-  force_reconnect socket
+{-| force_reconnect socket
 
-  force reconnect in case of inactivity from user.
+force reconnect in case of inactivity from user.
+
 -}
 force_reconnect : Int -> Socket msg -> ( Socket msg, Cmd (Msg msg) )
 force_reconnect totalRemainigJoins socket =
@@ -126,9 +133,8 @@ reconnectOnlyCurrentChannel =
     0
 
 
-{-|
-  Configure reconnection settings
-    reconnectFirstsTo
+{-| Configure reconnection settings
+reconnectFirstsTo
 -}
 config_reconnection : Int -> Int -> Socket msg -> Socket msg
 config_reconnection reconnectFirstsTo autoReconSec socket =
@@ -142,16 +148,14 @@ config_reconnection reconnectFirstsTo autoReconSec socket =
         { socket | reconnectFirstsTo = recFirstsStateCounter, autoReconnectAfterSec = autoReconSec, withoutAutoReconnect = False }
 
 
-{-|
-  Activate auto reconnection with default parameters
+{-| Activate auto reconnection with default parameters
 -}
 withAutoReconnection : Socket msg -> Socket msg
 withAutoReconnection socket =
     { socket | withoutAutoReconnect = False }
 
 
-{-|
--}
+{-| -}
 reJoinAllpreviousChannels : Socket msg -> ( Socket msg, Cmd (Msg msg) )
 reJoinAllpreviousChannels socket =
     if socket.withoutAutoReconnect then
@@ -275,6 +279,7 @@ withDebug socket =
 {-| Sends the heartbeat every interval in seconds
 
     Default is 30 seconds
+
 -}
 withHeartbeatInterval : Float -> Socket msg -> Socket msg
 withHeartbeatInterval intervalSeconds socket =
@@ -290,10 +295,14 @@ withoutHeartbeat socket =
 
 {-| Joins a channel
 
-    payload = Json.Encode.object [ ("user_id", Json.Encode.string "123") ]
-    channel = Channel.init "rooms:lobby" |> Channel.withPayload payload
-    (socket_, cmd) =
-      join channel socket
+    payload =
+        Json.Encode.object [ ( "user_id", Json.Encode.string "123" ) ]
+
+    channel =
+        Channel.init "rooms:lobby" |> Channel.withPayload payload
+
+    ( socket_, cmd ) =
+        join channel socket
 
 -}
 join : Channel msg -> Socket msg -> ( Socket msg, Cmd (Msg msg) )
@@ -340,7 +349,8 @@ joinChannel channel socket =
 
 {-| Leaves a channel
 
-    (socket_, cmd) = leave "rooms:lobby" socket
+    ( socket_, cmd ) =
+        leave "rooms:lobby" socket
 
 -}
 leave : String -> Socket msg -> ( Socket msg, Cmd (Msg msg) )
@@ -380,7 +390,7 @@ heartbeat socket =
 
 {-| sendHeatbeat
 
-   send heartbeat and not add to push messages
+send heartbeat and not add to push messages
 
 -}
 sendHeatbeat : Push msg -> Socket msg -> ( Socket msg, Cmd (Msg msg) )
@@ -405,8 +415,11 @@ forcePush push_ socket cmd =
 
 {-| Pushes a message
 
-    push_ = Phoenix.Push.init "new:msg" "rooms:lobby"
-    (socket_, cmd) = push push_ socket
+    push_ =
+        Phoenix.Push.init "new:msg" "rooms:lobby"
+
+    ( socket_, cmd ) =
+        push push_ socket
 
 -}
 push : Push msg -> Socket msg -> ( Socket msg, Cmd (Msg msg) )
@@ -474,8 +487,7 @@ listen socket fn =
         ]
 
 
-{-|
-  scheduleTimeout timer for auto reconnect
+{-| scheduleTimeout timer for auto reconnect
 -}
 scheduleTimeout : Socket msg -> Sub (Msg msg)
 scheduleTimeout socket =
