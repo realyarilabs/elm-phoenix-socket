@@ -1,3 +1,13 @@
+<<<<<<< HEAD
 /elm-stuff
 /examples/elm-stuff
 documentation.json
+=======
+examples/elm-stuff
+elm-stuff
+documentation.json
+tests/tests.js
+
+# Editor ignores
+.idea
+>>>>>>> fbonettiMaster/master

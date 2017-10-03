@@ -1,9 +1,6 @@
-module Phoenix.Channel exposing (Channel, State(..), init, withPayload, onError, onClose, onJoin, onJoinError, setState)
+module Phoenix.Channel exposing (Channel, State(..), init, withPayload, onError, onClose, onJoin, onJoinError, setState, map)
 
-{-|
-
-@docs Channel, State, init, withPayload, onError, onClose, onJoin, onJoinError, setState
-
+{-| @docs Channel, State, init, withPayload, onError, onClose, onJoin, onJoinError, setState, map
 -}
 
 import Phoenix.Helpers exposing (emptyPayload)
@@ -36,9 +33,7 @@ type State
 
 
 {-| Initializes a channel
-
-    init "rooms:lobby"
-
+init "rooms:lobby"
 -}
 init : String -> Channel msg
 init name =
@@ -84,10 +79,23 @@ onJoin valueToMsg channel =
     { channel | onJoin = Just valueToMsg }
 
 
-{-| -}
+{-| onJoinError
+-}
 onJoinError : (JE.Value -> msg) -> Channel msg -> Channel msg
 onJoinError valueToMsg channel =
     { channel | onJoinError = Just valueToMsg }
+
+
+{-| map
+-}
+map : (msg1 -> msg2) -> Channel msg1 -> Channel msg2
+map fn channel =
+    { channel
+        | onClose = Maybe.map ((<<) fn) channel.onClose
+        , onError = Maybe.map ((<<) fn) channel.onError
+        , onJoin = Maybe.map ((<<) fn) channel.onJoin
+        , onJoinError = Maybe.map ((<<) fn) channel.onJoinError
+    }
 
 
 {-| Sets the state of a channel. Internal use only.
